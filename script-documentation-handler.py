@@ -1,5 +1,6 @@
 import os
 import shutil
+import re
 
 
 def update_help_md(root_directory):
@@ -108,9 +109,51 @@ def remove_hash_from_line_6(root_directory):
                     
                     print(f"Updated {file_path}, modified line 6")
 
+
+def format_mgc_commands(root_directory):
+    for dirpath, dirnames, filenames in os.walk(root_directory):
+        for filename in filenames:
+            if filename.endswith('.md'):
+                file_path = os.path.join(dirpath, filename)
+                
+                with open(file_path, 'r') as file:
+                    content = file.read()
+                
+                # Substitui as ocorrências de - ./mgc ... por ```./mgc ...``` removendo o '-'
+                formatted_content = re.sub(r'- (\./mgc [^\n]*)', r'```\1```', content)
+                
+                # Remove crases no final do texto
+                formatted_content = re.sub(r'```(.*?)```', r'```\n\1\n```', formatted_content)
+                
+                with open(file_path, 'w') as file:
+                    file.write(formatted_content)
+                
+                print(f"Updated {file_path} with formatted ./mgc commands")
+
+
+def format_dash_dash_commands(root_directory):
+    for dirpath, dirnames, filenames in os.walk(root_directory):
+        for filename in filenames:
+            if filename.endswith('.md'):
+                file_path = os.path.join(dirpath, filename)
+                
+                with open(file_path, 'r') as file:
+                    content = file.read()
+                
+                # Substitui as ocorrências de - --<qualquer_texto> por - `--<qualquer_texto>`
+                formatted_content = re.sub(r'- (--[^\s]+)', r'- `\1`', content)
+                
+                with open(file_path, 'w') as file:
+                    file.write(formatted_content)
+                
+                print(f"Updated {file_path} with formatted --<qualquer_texto> commands")
+
 # Diretório raiz da sua estrutura de pastas
 root_directory = 'C:\\Users\\LU_PICOLOTO\\Documents\\portal-cloud\\docs-magalu-cloud\\docs\\cli-mgc\\commands-reference'
 update_help_md(root_directory)
 move_single_file_folders(root_directory)
 insert_sidebar_position(root_directory)
 remove_hash_from_line_6(root_directory)
+format_mgc_commands(root_directory)
+format_dash_dash_commands(root_directory)
+
